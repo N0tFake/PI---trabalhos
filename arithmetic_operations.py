@@ -1,12 +1,7 @@
 import cv2 as cv
 import numpy as np 
-import matplotlib.pyplot as plt
-import matplotlib.image as img
 
-img1 = cv.imread('imagens/dente.png')
-img2 = cv.imread('imagens/padrao.png')
-
-def sum():
+def sum(img1, img2):
   result = np.zeros(shape=(len(img1),len(img1[0]),3), dtype=np.uint8)
   for y in range(len(img1)):
     for x in range(len(img1[0])):
@@ -24,7 +19,7 @@ def sum():
       result[y][x] = pixel
   return result
 
-def subtraction():
+def subtraction(img1, img2):
   result = np.zeros(shape=(len(img1),len(img1[0]),3), dtype=np.uint8)
   for y in range(len(img1)):
     for x in range(len(img1[0])):
@@ -43,7 +38,7 @@ def subtraction():
       result[y][x] = pixel
   return result
   
-def multiplication():
+def multiplication(img1, img2):
   result = np.zeros(shape=(len(img1),len(img1[0]),3), dtype=np.uint8)
   for y in range(len(img1)):
     for x in range(len(img1[0])):
@@ -55,10 +50,7 @@ def multiplication():
       result[y][x] = pixel
   return result
 
-def division():
-  minR ,maxR = 0.0, 0.0
-  minG ,maxG = 0.0, 0.0
-  minB ,maxB = 0.0, 0.0
+def division(img1, img2):
   result = np.zeros(shape=(len(img1),len(img1[0]),3), dtype=np.uint8)
   for y in range(len(img1)):
     for x in range(len(img1[0])):
@@ -85,17 +77,12 @@ def division():
       
   return cv.normalize(result,None,0,255,cv.NORM_MINMAX)
 
-
-
-## TESTES
-
-#result = subtraction()
-#result = sum()
-#result = multiplication()
-#result = division()
-
-#result = cv.divide(img1, img2) 
-
-cv.imshow('teste', result)
-if cv.waitKey(0) & 0xff == 27:
- cv.destroyAllWindows() 
+def result(img1, img2, op):
+  if op == 1:
+    return sum(img1, img2)
+  elif op == 2:
+    return subtraction(img1, img2)
+  elif op == 3:
+    return multiplication(img1, img2)
+  elif op == 4:
+    return division(img1, img2)
