@@ -9,9 +9,15 @@ from geometric_transformations import rotation
 from geometric_transformations import scaling
 from geometric_transformations import reflection
 
+from histograms import histograms
+from histograms import normalizeHist
+from histograms import equalizeHist
+from histograms import contrastStreching
+
 import os
 import cv2 as cv
 import numpy as np
+from matplotlib import pyplot as plt
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -43,6 +49,8 @@ def mainMenu():
         opMenu()
     elif opc == 2:
         tgMenu()
+    elif opc == 3:
+        histMenu()
         
 def opMenu():
     clear()
@@ -73,9 +81,7 @@ def opMenu():
         img2 = cv.imread(pathImg2)
         resultado = result(img1, img2, op)
         alert()
-        imgs = np.concatenate((img1, img2, resultado), axis=1)
-        cv.imshow('Resultado', imgs)
-        cv.waitKey(0)
+        opMostraImg(img1, img2, resultado)
 
         save(resultado)
 
@@ -111,11 +117,8 @@ def tgMenu():
         
         img = cv.imread(pathImg, 0)
         result = translation(img, width, height)
-        seta = cv.imread('operadores/seta.png', 0)
-        imgs = np.concatenate((img, seta, result), axis=1)
         alert()
-        cv.imshow('Resultado', imgs)
-        cv.waitKey(0)
+        tgMostraImg(img, result)
         save(result)
         
     elif op == 2:
@@ -127,11 +130,8 @@ def tgMenu():
         
         img = cv.imread(pathImg, 0)
         result = rotation(img, degree)
-        seta = cv.imread('operadores/seta.png', 0)
-        imgs = np.concatenate((img, seta, result), axis=1)
         alert()
-        cv.imshow('Resultado', imgs)
-        cv.waitKey(0)
+        tgMostraImg(img, result)
         save(result)
         
     elif op == 3:
@@ -144,6 +144,8 @@ def tgMenu():
         
         img = cv.imread(pathImg, 0)
         result = scaling(img, x, y)
+        alert()
+        tgMostraImg(img, result)
         save(result)
         
     elif op == 4:
@@ -157,12 +159,81 @@ def tgMenu():
         
         img = cv.imread(pathImg, 0)
         result = reflection(img, direction)
-        seta = cv.imread('operadores/seta.png', 0)
-        imgs = np.concatenate((img, seta, result), axis=1)
         alert()
-        cv.imshow('Resultado', imgs)
-        cv.waitKey(0)
+        tgMostraImg(img, result)
         save(result)
+
+def histMenu():
+    clear()
+    print("+------------------------------------------------------+")
+    print("|                    Histrogramas                      |")
+    print("+------------------------------------------------------+")
+    print("|           Informe o diretorio da imagem              |")
+    print("|              Ex: imagens/imagem.png                  |")
+    print("+------------------------------------------------------+")
+    pathImg = input('Diretorio da imagem: ')
+    print("+------------------------------------------------------+")
+    print("|                 Informe o histrograma                |")
+    print("+------------------------------------------------------+")
+    print('| [1] Histrograma                                      |')
+    print('| [2] Histograma Normalizado                           |')
+    print('| [3] Histograma equalizado e Enhancement              |')
+    print('| [4] Contrast Streching                               |')
+    print('| [0] Para retornar para o menu                        |')
+    print("+------------------------------------------------------+")
+    op = int(input('Operação: '))
+    img = cv.imread(pathImg)
+    alert()
+    if op == 0:
+        mainMenu()
+    elif op == 1:
+      histograms(img)
+    elif op == 2:
+        normalizeHist(img)
+    elif op == 3:
+        equalizeHist(img)
+    elif op == 4:
+        contrastStreching(img) 
+    mainMenu()
+    
+
+def tgMostraImg(img, result):
+    
+    fig = plt.figure(figsize=(10, 7))
+    rows, columns = 1, 2
+    
+    fig.add_subplot(rows, columns, 1)
+    plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    plt.title("Imagem original")
+    
+    fig.add_subplot(rows, columns, 2)
+    plt.imshow(cv.cvtColor(result, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    plt.title("Resultado")
+    
+    plt.show()
+
+def opMostraImg(img1, img2, result):
+    fig = plt.figure(figsize=(10, 7))
+    rows, columns = 1, 3
+    
+    fig.add_subplot(rows, columns, 1)
+    plt.imshow(img1)
+    plt.axis('off')
+    plt.title("Imagem 1")
+    
+    fig.add_subplot(rows, columns, 2)
+    plt.imshow(img2)
+    plt.axis('off')
+    plt.title("Imagem 2")
+    
+    fig.add_subplot(rows, columns, 3)
+    plt.imshow(result)
+    plt.axis('off')
+    plt.title("Resultado")
+    
+    plt.show()
 
 def alert():
     clear()
@@ -182,7 +253,7 @@ def save(result):
     print("+------------------------------------------------------+")
     name = input("Nome da imagem: ")
     file = name + '.png'
-    path = 'resultado/' + file
+    path = 'resultados/' + file
     cv.imwrite(path, result)
     print("+------------------------------------------------------+")
     print("|                  Imagem salva                        |")
