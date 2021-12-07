@@ -21,7 +21,6 @@ def histograms(img):
 
 def normalizeHist(img):
     weights = np.ones_like(img.ravel())/float(len(img))
-    
     fig = plt.figure(figsize=(12, 5))
     rows = 1
     columns = 2
