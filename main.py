@@ -14,6 +14,11 @@ from histograms import normalizeHist
 from histograms import equalizeHist
 from histograms import contrastStreching
 
+from spatial_filtering import MFrepublication
+from spatial_filtering import MFzeros
+from spatial_filtering import MFpaddingZeros
+from spatial_filtering import MFconvolution
+
 import os
 import cv2 as cv
 import numpy as np
@@ -39,6 +44,7 @@ def mainMenu():
     print("|           [1] Operações aritimetias                  |")
     print("|           [2] Transformações geométricas             |")
     print("|           [3] Histogramas                            |")
+    print("|           [4] Filtragem espacial - Smoothing         |")
     print("|           [0] Sair                                   |")
     print("+------------------------------------------------------+")
     opc = int(input('Opção: '))
@@ -51,6 +57,8 @@ def mainMenu():
         tgMenu()
     elif opc == 3:
         histMenu()
+    elif opc == 4:
+        filterMenu()
         
 def opMenu():
     clear()
@@ -195,8 +203,61 @@ def histMenu():
     elif op == 4:
         contrastStreching(img) 
     mainMenu()
-    
+ 
+def filterMenu():   
+    clear()
+    print("+------------------------------------------------------+")
+    print("|           Filtragem espacial - Smoothing             |")
+    print("+------------------------------------------------------+")
+    print("|           Informe o diretorio da imagem              |")
+    print("|              Ex: imagens/imagem.png                  |")
+    print("+------------------------------------------------------+")
+    pathImg = input('Diretorio da imagem: ')
+    print("+------------------------------------------------------+")
+    print("|           Informe o tamanho da vizinhança            |")
+    print("|  Obs: Quanto maior o numero, mais tempo irá demorar  |")
+    print("+------------------------------------------------------+")
+    filter_size = int(input("Tamanho da vizinhança: "));
+    alert()
+    img = cv.imread(pathImg, 0)
+    result1 = MFrepublication(img, filter_size)
+    result2 = MFzeros(img, filter_size)
+    result3 = MFpaddingZeros(img, filter_size)
+    result4 = MFconvolution(img, filter_size)
+    stMostraImg(img, result1, result2, result3, result4)
+    mainMenu()    
 
+def stMostraImg(img, result1, result2, result3, result4):
+    fig = plt.figure(figsize=(12,5))
+    rows, columns = 1, 5
+
+    fig.add_subplot(rows, columns, 1)
+    plt.imshow(cv.cvtColor(img, cv.COLOR_RGB2BGR))
+    plt.axis('off')
+    plt.title('Original')
+
+    fig.add_subplot(rows, columns, 2)
+    plt.imshow(cv.cvtColor(result1, cv.COLOR_RGB2BGR))
+    plt.axis('off')
+    plt.title('Tipo de borda:\n Replicação dos pixels')
+
+    fig.add_subplot(rows, columns, 3)
+    plt.imshow(cv.cvtColor(result2, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    plt.title('Tipo de borda:\n Atribuindo zeros')
+
+    fig.add_subplot(rows, columns, 4)
+    plt.imshow(cv.cvtColor(result3, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    plt.title('Tipo de borda:\n Padding com zeros')
+
+    fig.add_subplot(rows, columns, 5)
+    plt.imshow(cv.cvtColor(result4, cv.COLOR_BGR2RGB))
+    plt.axis('off')
+    plt.title('Tipo de borda:\n Convulação Periódica')
+
+    plt.show()
+    
 def tgMostraImg(img, result):
     
     fig = plt.figure(figsize=(10, 7))

@@ -3,10 +3,6 @@ import numpy as np
 from PIL import Image
 import cv2 as cv
 
-img = cv.imread('imagens/tree.png', 0)
-
-openCV = cv.medianBlur(img, 3)
-
 #  Replicação dos pixels das bordas
 def MFrepublication(img, filter_size):
     temp = []
@@ -99,40 +95,5 @@ def MFconvolution(img, filter_size):
             result[y][x] = temp[len(temp)// 2]
             temp = []
     return result
-
-result1 = MFrepublication(img, 3)
-result2 = MFzeros(img, 3)
-result3 = MFpaddingZeros(img, 3)
-result4 = MFconvolution(img, 3)
-
-fig = plt.figure(figsize=(10,5))
-rows, columns = 1, 5
-
-fig.add_subplot(rows, columns, 1)
-plt.imshow(cv.cvtColor(img, cv.COLOR_RGB2BGR))
-plt.axis('off')
-plt.title('Original')
-
-fig.add_subplot(rows, columns, 2)
-plt.imshow(cv.cvtColor(result1, cv.COLOR_RGB2BGR))
-plt.axis('off')
-plt.title('MF replicação')
-
-fig.add_subplot(rows, columns, 3)
-plt.imshow(cv.cvtColor(result2, cv.COLOR_BGR2RGB))
-plt.axis('off')
-plt.title('MF zeros')
-
-fig.add_subplot(rows, columns, 4)
-plt.imshow(cv.cvtColor(result3, cv.COLOR_BGR2RGB))
-plt.axis('off')
-plt.title('MF padding')
-
-fig.add_subplot(rows, columns, 5)
-plt.imshow(cv.cvtColor(result4, cv.COLOR_BGR2RGB))
-plt.axis('off')
-plt.title('MF convulação')
-
-plt.show()
 
  
