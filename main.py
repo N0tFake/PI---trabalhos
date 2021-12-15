@@ -19,6 +19,15 @@ from spatial_filtering import MFzeros
 from spatial_filtering import MFpaddingZeros
 from spatial_filtering import MFconvolution
 
+from Laplacian_filters import laplacian
+from Laplacian_filters import LoG
+from Laplacian_filters import sharpening
+from Laplacian_filters import unsharpMask
+from Laplacian_filters import highboost
+from Laplacian_filters import gradient
+from Laplacian_filters import roberts
+from Laplacian_filters import sobel
+
 import os
 import cv2 as cv
 import numpy as np
@@ -32,7 +41,7 @@ def mainMenu():
     print("+------------------------------------------------------+")
     print("|           UFT - Processamento de Imagens             |")
     print("|                                                      |")
-    print("|                 Trabalho 01 e 02                     |")
+    print("|             Trabalho 01, 02, 03 e 04                 |")
     print("|                                                      |")
     print("| Alunos:  Amauri Melo Mendes Jr                       |")
     print("|          Jhonata B. Silva                            |")
@@ -45,6 +54,7 @@ def mainMenu():
     print("|           [2] Transformações geométricas             |")
     print("|           [3] Histogramas                            |")
     print("|           [4] Filtragem espacial - Smoothing         |")
+    print("|           [5] Filtragem espacial - Laplacian         |")
     print("|           [0] Sair                                   |")
     print("+------------------------------------------------------+")
     opc = int(input('Opção: '))
@@ -59,6 +69,10 @@ def mainMenu():
         histMenu()
     elif opc == 4:
         filterMenu()
+    elif opc == 5:
+        laplacianMenu()
+    else:
+        exit()
         
 def opMenu():
     clear()
@@ -227,35 +241,61 @@ def filterMenu():
     stMostraImg(img, result1, result2, result3, result4)
     mainMenu()    
 
+def laplacianMenu():
+    clear()
+    print("+------------------------------------------------------+")
+    print("|          Filtragem espacial - Laplacianos            |")
+    print("+------------------------------------------------------+")
+    print("|           Informe o diretorio da imagem              |")
+    print("|              Ex: imagens/imagem.png                  |")
+    print("+------------------------------------------------------+")
+    pathImg = input('Diretorio da imagem: ')
+    sigma = float(input('Digite o valor de sigma para ser usado no filtro LOG: '))
+    img = cv.imread(pathImg)
+    
+    resultLaplacian = laplacian(img)
+    resultSharpenind = sharpening(img, resultLaplacian)
+    resultLOG = LoG(img, sigma)
+    resultUnsharp = unsharpMask(img)
+    resultHightboost = highboost(img, sigma)
+    resultGradientX, resultGradientY  = gradient(img)
+    resultRoberts = roberts(img)
+    resultSobel = sobel(img)
+    
+    alert()
+    flMostraImg(img, resultLaplacian, resultSharpenind, resultLOG, 
+                resultUnsharp, resultHightboost, resultGradientX, 
+                resultGradientY, resultRoberts, resultSobel)
+
+def flMostraImg(img, resultLaplacian, resultSharpenind, resultLOG, 
+                resultUnsharp, resultHightboost, resultGradientX, 
+                resultGradientY, resultRoberts, resultSobel):
+
+    fig = plt.figure(figsize=(12,5))
+    rows, columns = 2, 5
+    
+    fig.add_subplot(rows, columns, 1), plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Original')
+    fig.add_subplot(rows, columns, 2), plt.imshow(cv.cvtColor(resultLaplacian, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Laplaciano')
+    fig.add_subplot(rows, columns, 3), plt.imshow(cv.cvtColor(resultSharpenind, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Sharpenind')
+    fig.add_subplot(rows, columns, 4), plt.imshow(cv.cvtColor(resultLOG, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('LoG')
+    fig.add_subplot(rows, columns, 5), plt.imshow(cv.cvtColor(resultUnsharp, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Unsharp mask')
+    fig.add_subplot(rows, columns, 6), plt.imshow(cv.cvtColor(resultHightboost, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Hightboost')
+    fig.add_subplot(rows, columns, 7), plt.imshow(cv.cvtColor(resultGradientX, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Gradiente X')
+    fig.add_subplot(rows, columns, 8), plt.imshow(cv.cvtColor(resultGradientY, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Gradiente Y')
+    fig.add_subplot(rows, columns, 9), plt.imshow(cv.cvtColor(resultRoberts, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Roberts')
+    fig.add_subplot(rows, columns, 10), plt.imshow(cv.cvtColor(resultSobel, cv.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Sobel')
+
+    plt.show()
+    
 def stMostraImg(img, result1, result2, result3, result4):
     fig = plt.figure(figsize=(12,5))
     rows, columns = 1, 5
 
-    fig.add_subplot(rows, columns, 1)
-    plt.imshow(cv.cvtColor(img, cv.COLOR_RGB2BGR))
-    plt.axis('off')
-    plt.title('Original')
-
-    fig.add_subplot(rows, columns, 2)
-    plt.imshow(cv.cvtColor(result1, cv.COLOR_RGB2BGR))
-    plt.axis('off')
-    plt.title('Tipo de borda:\n Replicação dos pixels')
-
-    fig.add_subplot(rows, columns, 3)
-    plt.imshow(cv.cvtColor(result2, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-    plt.title('Tipo de borda:\n Atribuindo zeros')
-
-    fig.add_subplot(rows, columns, 4)
-    plt.imshow(cv.cvtColor(result3, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-    plt.title('Tipo de borda:\n Padding com zeros')
-
-    fig.add_subplot(rows, columns, 5)
-    plt.imshow(cv.cvtColor(result4, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-    plt.title('Tipo de borda:\n Convulação Periódica')
-
+    fig.add_subplot(rows, columns, 1), plt.imshow(cv.cvtColor(img, cv.COLOR_RGB2BGR)), plt.axis('off'), plt.title('Original')
+    fig.add_subplot(rows, columns, 2), plt.imshow(cv.cvtColor(result1, cv.COLOR_RGB2BGR)),plt.axis('off'), plt.title('Tipo de borda:\n Replicação dos pixels')
+    fig.add_subplot(rows, columns, 3),plt.imshow(cv.cvtColor(result2, cv.COLOR_BGR2RGB)),plt.axis('off'),plt.title('Tipo de borda:\n Atribuindo zeros')
+    fig.add_subplot(rows, columns, 4),plt.imshow(cv.cvtColor(result3, cv.COLOR_BGR2RGB)),plt.axis('off'), plt.title('Tipo de borda:\n Padding com zeros')
+    fig.add_subplot(rows, columns, 5),plt.imshow(cv.cvtColor(result4, cv.COLOR_BGR2RGB)),plt.axis('off'),plt.title('Tipo de borda:\n Convulação Periódica')
     plt.show()
     
 def tgMostraImg(img, result):
@@ -263,37 +303,17 @@ def tgMostraImg(img, result):
     fig = plt.figure(figsize=(10, 7))
     rows, columns = 1, 2
     
-    fig.add_subplot(rows, columns, 1)
-    plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-    plt.title("Imagem original")
-    
-    fig.add_subplot(rows, columns, 2)
-    plt.imshow(cv.cvtColor(result, cv.COLOR_BGR2RGB))
-    plt.axis('off')
-    plt.title("Resultado")
-    
+    fig.add_subplot(rows, columns, 1),plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB)),plt.axis('off'),plt.title("Imagem original")
+    fig.add_subplot(rows, columns, 2),plt.imshow(cv.cvtColor(result, cv.COLOR_BGR2RGB)),plt.axis('off'), plt.title("Resultado") 
     plt.show()
 
 def opMostraImg(img1, img2, result):
     fig = plt.figure(figsize=(10, 7))
     rows, columns = 1, 3
     
-    fig.add_subplot(rows, columns, 1)
-    plt.imshow(img1)
-    plt.axis('off')
-    plt.title("Imagem 1")
-    
-    fig.add_subplot(rows, columns, 2)
-    plt.imshow(img2)
-    plt.axis('off')
-    plt.title("Imagem 2")
-    
-    fig.add_subplot(rows, columns, 3)
-    plt.imshow(result)
-    plt.axis('off')
-    plt.title("Resultado")
-    
+    fig.add_subplot(rows, columns, 1), plt.imshow(img1),plt.axis('off'),plt.title("Imagem 1")
+    fig.add_subplot(rows, columns, 2),plt.imshow(img2),plt.axis('off'),plt.title("Imagem 2")
+    fig.add_subplot(rows, columns, 3),plt.imshow(result), plt.axis('off'),plt.title("Resultado")
     plt.show()
 
 def alert():
